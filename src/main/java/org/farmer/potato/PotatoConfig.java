@@ -1,5 +1,5 @@
 package org.farmer.potato;
-import org.farmer.potato.util.PotatoUtil;
+import org.farmer.potato.util.FarmTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * Date: 2016/11/6
  * Time: 14:33
  */
-public class PotatoConfig implements PotatoPoolMXBean {
+public class PotatoConfig implements PotatoFarmlandMXBean {
 
     private final Logger logger = LoggerFactory.getLogger(PotatoConfig.class);
 
@@ -54,7 +54,7 @@ public class PotatoConfig implements PotatoPoolMXBean {
     private boolean isInitializationFailFast;
     private boolean isIsolateInternalQueries;
     private boolean isRegisterMbeans;
-    private boolean isAllowPoolSuspension;
+    private boolean isAllowPoolPause;
     private DataSource dataSource;
     private Properties dataSourceProperties;
     private ThreadFactory threadFactory;
@@ -84,7 +84,7 @@ public class PotatoConfig implements PotatoPoolMXBean {
 
     public PotatoConfig(Properties prop) {
         this();
-        PotatoUtil.setPropToObjectField(prop, this);
+        FarmTools.setPropToObjectField(prop, this);
     }
 
     public PotatoConfig(String configFilePath) {
@@ -102,7 +102,7 @@ public class PotatoConfig implements PotatoPoolMXBean {
             }
             Properties prop = new Properties();
             prop.load(in);
-            PotatoUtil.setPropToObjectField(prop, this);
+            FarmTools.setPropToObjectField(prop, this);
         } catch (IOException e) {
             throw new RuntimeException("Failed to read property file", e);
         }
@@ -315,12 +315,12 @@ public class PotatoConfig implements PotatoPoolMXBean {
         isRegisterMbeans = registerMbeans;
     }
 
-    public boolean isAllowPoolSuspension() {
-        return isAllowPoolSuspension;
+    public boolean isAllowPoolPause() {
+        return isAllowPoolPause;
     }
 
-    public void setAllowPoolSuspension(boolean allowPoolSuspension) {
-        isAllowPoolSuspension = allowPoolSuspension;
+    public void setAllowPoolPause(boolean allowPoolPause) {
+        isAllowPoolPause = allowPoolPause;
     }
 
     public DataSource getDataSource() {
@@ -378,9 +378,10 @@ public class PotatoConfig implements PotatoPoolMXBean {
 
     }
     @Override
-    public void suspendPool() {
+    public void pausePool() {
 
     }
+
     @Override
     public void resumePool() {
 

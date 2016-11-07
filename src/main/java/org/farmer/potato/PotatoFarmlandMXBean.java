@@ -3,7 +3,7 @@ package org.farmer.potato;
 /**
  * Created by zhangjiajun2 on 2016/11/6.
  */
-public interface PotatoPoolMXBean {
+public interface PotatoFarmlandMXBean {
     /**
      * 获取空闲连接数量
      * @return
@@ -31,9 +31,9 @@ public interface PotatoPoolMXBean {
     void softEvictConnections();
 
     /**
-     * 暂停连接池
+     * 挂起连接池
      */
-    void suspendPool();
+    void pausePool();
 
     /**
      * 恢复连接池

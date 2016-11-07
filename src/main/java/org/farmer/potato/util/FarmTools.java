@@ -9,15 +9,21 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
- * Created with IntelliJ IDEA.
+ * 农具
  * User: zhangjiajun2
  * Date: 2016/11/6
  * Time: 15:03
  */
-public class PotatoUtil {
-    private static final Logger logger = LoggerFactory.getLogger(PotatoUtil.class);
+public class FarmTools {
+    private static final Logger logger = LoggerFactory.getLogger(FarmTools.class);
 
     public static void setPropToObjectField(final Properties prop, final Object obj) {
         if (prop == null || obj == null) {
@@ -85,6 +91,25 @@ public class PotatoUtil {
     public static String getNullIsBlank(final String str) {
         return str == null ? null : str.trim() == "" ? null : str.trim();
     }
+    public static boolean isBlank(String str) {
+        int strLen;
+        if(str != null && (strLen = str.length()) != 0) {
+            for(int i = 0; i < strLen; ++i) {
+                if(!Character.isWhitespace(str.charAt(i))) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return true;
+        }
+    }
+    public static boolean isNotBlank(String str) {
+        return !isBlank(str);
+    }
+
+
 
     /**
      * 获取事务隔离级别
@@ -115,5 +140,24 @@ public class PotatoUtil {
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid transaction isolation value: " + transactionIsolationName);
         }
+    }
+
+    public static ThreadPoolExecutor createThreadPoolExecutor(int queueSize, final String threadName,
+                                                              ThreadFactory threadFactory,
+                                                              RejectedExecutionHandler policy) {
+        if (threadFactory == null) {
+            threadFactory = new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread thread = new Thread(r, threadName);
+                    thread.setDaemon(true);
+                    return thread;
+                }
+            };
+        }
+        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(queueSize);
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 5, SECONDS, queue, threadFactory, policy);
+        executor.allowCoreThreadTimeOut(true);
+        return executor;
     }
 }

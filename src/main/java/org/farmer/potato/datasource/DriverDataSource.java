@@ -18,7 +18,7 @@ import java.util.Properties;
  */
 public class DriverDataSource implements DataSource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DriverDataSource.class);
+    private final Logger logger = LoggerFactory.getLogger(DriverDataSource.class);
     private final String jdbcUrl;
     private final Properties driverProperties;
     private Driver driver;
@@ -35,7 +35,9 @@ public class DriverDataSource implements DataSource {
         if (password != null) {
             driverProperties.put("password", driverProperties.getProperty("password", password));
         }
-        //实例化驱动对象
+        /*****************
+         * 实例化驱动对象 *
+         *****************/
         if (driverClassName != null) {
             Enumeration<Driver> drivers = DriverManager.getDrivers();
             while (drivers.hasMoreElements()) {
@@ -47,12 +49,12 @@ public class DriverDataSource implements DataSource {
             }
         }
         if (driver == null) {
-            LOGGER.warn("Registered driver with driverClassName={} was not found, trying direct instantiation.", driverClassName);
+            logger.warn("没有在DriverManager中找到驱动类{}, 开始尝试直接实例化驱动类的对象", driverClassName);
             try {
                 Class<?> driverClass = this.getClass().getClassLoader().loadClass(driverClassName);
                 driver = (Driver) driverClass.newInstance();
             } catch (Exception e) {
-                LOGGER.warn("Failed to create instance of driver class {}, trying jdbcUrl resolution", driverClassName, e);
+                logger.warn("实例化驱动类{}的对象失败, 开始尝试使用jdbcUrl从驱动管理器中获取", driverClassName, e);
             }
         }
 
@@ -60,10 +62,10 @@ public class DriverDataSource implements DataSource {
             if (driver == null) {
                 driver = DriverManager.getDriver(jdbcUrl);
             } else if (!driver.acceptsURL(jdbcUrl)) {
-                throw new RuntimeException("Driver " + driverClassName + " claims to not accept jdbcUrl, " + jdbcUrl);
+                throw new RuntimeException("驱动类 " + driverClassName + " 不支持jdbcUrl, " + jdbcUrl);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to get driver instance for jdbcUrl=" + jdbcUrl, e);
+            throw new RuntimeException("根据jdbcUrl从驱动管理器中获取驱动失败, jdbcUrl=" + jdbcUrl, e);
         }
 
     }
