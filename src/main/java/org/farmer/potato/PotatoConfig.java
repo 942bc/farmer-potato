@@ -32,8 +32,8 @@ public class PotatoConfig implements PotatoFarmlandMXBean {
 
     private volatile long connectionTimeout;
     private volatile long validationTimeout;
-    private volatile long idleTimeout;
-    private volatile long leakDetectionThreshold;
+    private volatile long idleTimeout;            //空闲时间
+    private volatile long sickDetectionThreshold; //生病检测阀值
     private volatile long maxLifetime;
     private volatile int maxPoolSize;
     private volatile int minIdle;
@@ -143,12 +143,12 @@ public class PotatoConfig implements PotatoFarmlandMXBean {
         this.idleTimeout = idleTimeout;
     }
 
-    public long getLeakDetectionThreshold() {
-        return leakDetectionThreshold;
+    public long getSickDetectionThreshold() {
+        return sickDetectionThreshold;
     }
 
-    public void setLeakDetectionThreshold(long leakDetectionThreshold) {
-        this.leakDetectionThreshold = leakDetectionThreshold;
+    public void setSickDetectionThreshold(long sickDetectionThreshold) {
+        this.sickDetectionThreshold = sickDetectionThreshold;
     }
 
     public long getMaxLifetime() {

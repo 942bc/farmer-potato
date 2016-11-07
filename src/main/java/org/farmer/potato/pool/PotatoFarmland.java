@@ -37,8 +37,11 @@ public class PotatoFarmland extends BasePool implements PotatoFarmlandMXBean {
 
     private ScheduledFuture<?> feedTask; //施肥任务
 
+    private final PotatoReaper potatoReaper; //土豆收割人
+
 
     public PotatoFarmland(final PotatoConfig config){
+        //准备生产资料
         super(config);
         ThreadFactory threadFactory = config.getThreadFactory();
         this.addConnExecutor = FarmTools.createThreadPoolExecutor(config.getMaxPoolSize(), poolName + " conn adder", threadFactory, new ThreadPoolExecutor.DiscardPolicy());
@@ -58,12 +61,14 @@ public class PotatoFarmland extends BasePool implements PotatoFarmlandMXBean {
         }
         this.stateLock = new PoolStateLock(config.isAllowPoolPause());
 
-        //施肥保活
+        //定期施肥保活
         this.feedTask = this.feedExecutorService.scheduleWithFixedDelay(
                 new PotatoFertilizer(this),
                 100L, FEED_PERIOD_MS, TimeUnit.MILLISECONDS);
 
         //收割生病的土豆
+        this.potatoReaper = new PotatoReaper(this);
+
 
 
     }

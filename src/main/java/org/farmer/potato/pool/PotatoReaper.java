@@ -1,5 +1,8 @@
 package org.farmer.potato.pool;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+
 /**
  * 土豆收割者
  * User: zhangjiajun2
@@ -8,14 +11,26 @@ package org.farmer.potato.pool;
  */
 public class PotatoReaper implements Runnable {
 
-    private final PotatoFarmland pool;
+    private final PotatoFarmland farmland; //土豆地
 
-    public PotatoReaper(PotatoFarmland pool) {
-        this.pool = pool;
+    private ScheduledExecutorService reaperScheduledExecutor;
+
+    private String potatoName; //土豆名
+
+    private Throwable throwable;
+
+    private long sickDetectionThreshold; //生病判断阀值，超过阀值设定时间不再生长认为生病
+
+    private boolean isSick;    //是否生病
+
+    private ScheduledFuture<?> scheduledFuture;
+
+    public PotatoReaper(PotatoFarmland farmland) {
+        this.farmland = farmland;
     }
 
     @Override
     public void run() {
-        final long connectionTimeout = pool.potatoConfig.getConnectionTimeout();
+        isSick = true;
     }
 }

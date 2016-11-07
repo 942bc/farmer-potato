@@ -3,7 +3,6 @@ package org.farmer.potato.pool;
 import org.farmer.potato.PotatoConfig;
 import org.farmer.potato.util.FarmTools;
 import org.farmer.potato.datasource.DriverDataSource;
-import org.farmer.potato.util.DefaultThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,7 +161,14 @@ abstract class BasePool {
             };
         } else {
             ThreadFactory threadFactory = potatoConfig.getThreadFactory();
-            threadFactory = threadFactory != null ? threadFactory : new DefaultThreadFactory(poolName + " network timeout executor", true);
+            threadFactory = threadFactory != null ? threadFactory : new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread thread = new Thread(r, poolName + " network timeout executor");
+                    thread.setDaemon(true);
+                    return thread;
+                }
+            };
             ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool(threadFactory);
             executor.setKeepAliveTime(15, SECONDS);
             executor.allowCoreThreadTimeOut(true);
